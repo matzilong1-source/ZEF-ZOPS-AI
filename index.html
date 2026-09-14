@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZEF AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16110c;
+    --bg-plank: #241a10;
+    --panel: #2a1f14;
+    --panel-2: #201709;
+    --border: #6b4a2a;
+    --border-light: #8a6338;
+    --grass: #6fae44;
+    --grass-dark: #4d7d2e;
+    --sky: #52c1e0;
+    --gem-red: #c9524a;
+    --text: #f2e6cf;
+    --text-dim: #b8a583;
+    --code-bg: #120d08;
+    --code-text: #d9cdb0;
+    --shadow: 0 4px 0 rgba(0,0,0,0.45);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
+      repeating-linear-gradient(90deg, var(--bg) 0px, var(--bg) 38px, var(--bg-plank) 38px, var(--bg-plank) 40px);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 28px 16px 60px;
+  }
+  .wrap{max-width: 1100px; margin: 0 auto;}
+
+  .sign{
+    background: var(--panel);
+    border: 4px solid var(--border);
+    box-shadow: var(--shadow), inset 0 0 0 2px rgba(0,0,0,0.3);
+    padding: 22px 24px;
+    margin-bottom: 22px;
+    position: relative;
+  }
+  .sign::before, .sign::after{
+    content: "";
+    position: absolute;
+    width: 10px; height: 10px;
+    background: var(--border-light);
+    top: 8px;
+  }
+  .sign::before{ left: 8px; }
+  .sign::after{ right: 8px; }
+  .eyebrow-tag{
+    display:inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--sky);
+    background: rgba(82,193,224,0.1);
+    border: 1px solid rgba(82,193,224,0.35);
+    padding: 3px 8px;
+    margin-bottom: 12px;
+  }
+  h1{
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(16px, 3.4vw, 26px);
+    line-height: 1.6;
+    margin: 0 0 10px;
+    color: var(--grass);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  }
+  .sign p{
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 14.5px;
+    max-width: 62ch;
+    line-height: 1.55;
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 860px){ .grid{ grid-template-columns: 1fr; } }
+
+  .card{
+    background: var(--panel);
+    border: 3px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .card-head{
+    background: var(--panel-2);
+    border-bottom: 3px solid var(--border);
+    padding: 10px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .card-head span{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+  .dots{ display:flex; gap:6px; }
+  .dot{ width:9px; height:9px; background: var(--border-light); }
+  .card-body{ padding: 18px; }
+
+  label{
+    display:block;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  textarea, input[type="text"]{
+    width: 100%;
+    background: var(--code-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 10px 12px;
+    resize: vertical;
+    outline: none;
+  }
+  textarea{ min-height: 96px; line-height:1.5; }
+  textarea:focus, input[type="text"]:focus{ border-color: var(--grass); }
+  .field{ margin-bottom: 16px; }
+  .hint{ font-size: 12px; color: #8a7a5c; margin-top: 5px; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap: 8px; }
+  .chip{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    padding: 7px 11px;
+    border: 2px solid var(--border);
+    background: var(--code-bg);
+    color: var(--text-dim);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .chip:hover{ border-color: var(--border-light); }
+  .chip.active{
+    background: rgba(111,174,68,0.16);
+    border-color: var(--grass);
+    color: var(--grass);
+  }
+
+  button.forge{
+    width: 100%;
+    margin-top: 6px;
+    background: var(--grass-dark);
+    border: 3px solid var(--grass);
+    color: #f4fbee;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    padding: 14px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #2f5019;
+    transition: transform .06s;
+  }
+  button.forge:hover{ filter: brightness(1.08); }
+  button.forge:active{ transform: translateY(2px); box-shadow: 0 1px 0 #2f5019; }
+  button.forge:disabled{ opacity: .55; cursor: not-allowed; }
+
+  .out-body{ padding: 0; }
+  pre.code{
+    margin:0;
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.8px;
+    line-height: 1.55;
+    padding: 16px;
+    overflow-x: auto;
+    max-height: 560px;
+    overflow-y: auto;
+    white-space: pre;
+  }
+  .placeholder{
+    padding: 40px 20px;
+    text-align:center;
+    color: #6f6248;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .toolbar{
+    display:flex; gap:8px; padding: 10px 12px;
+    border-top: 3px solid var(--border);
+    background: var(--panel-2);
+  }
+  .tbtn{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    border: 2px solid var(--border);
+    color: var(--text-dim);
+    padding: 7px 12px;
+    cursor: pointer;
+  }
+  .tbtn:hover{ border-color: var(--sky); color: var(--sky); }
+
+  .err{
+    margin: 12px 16px 0;
+    padding: 10px 12px;
+    border: 2px solid var(--gem-red);
+    background: rgba(201,82,74,0.12);
+    color: #f0b8b4;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .history{ margin-top: 18px; }
+  .history-title{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .h-item{
+    display:flex; justify-content:space-between; gap:10px;
+    padding: 9px 12px;
+    border: 2px solid var(--border);
+    background: var(--panel-2);
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 12.5px;
+  }
+  .h-item:hover{ border-color: var(--sky); }
+  .h-item .fn{ color: var(--sky); font-family:'JetBrains Mono', monospace; }
+  .h-item .desc{ color: var(--text-dim); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .spinner{
+    display:inline-block; width:12px; height:12px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #f4fbee;
+    border-radius:50%;
+    animation: spin .7s linear infinite;
+    margin-right: 8px;
+    vertical-align: -1px;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="sign">
+    <span class="eyebrow-tag">AI SCRIPT GENERATOR</span>
+    <h1>ZEF AI</h1>
+    <p>Jelaskan fitur atau command yang kamu mau, dan ZEF AI akan menulis skrip Lua GTPS-nya langsung untuk kamu — lengkap dengan komentar dan struktur yang siap pakai di server kamu.</p>
+    <p style="margin-top:10px; color: var(--sky); font-weight:600;">APLIKASI INI DIGUNAKAN UNTUK MEMBUAT SCRIPT DENGAN MUDAH DAN GRATIS</p>
+    <p style="margin-top:6px; color: var(--grass); font-weight:600;">TANPA BATAS DAN TANPA COOLDOWN</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-head">
+        <span>form_request.lua</span>
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label for="desc">Apa yang mau dibuat?</label>
+          <textarea id="desc" placeholder="Contoh: command /heal untuk admin, isi HP player yang ditarget penuh dan kirim efek pop-up"></textarea>
+          <div class="hint">Semakin detail deskripsinya, semakin pas hasil skripnya.</div>
+        </div>
+
+        <div class="field">
+          <label for="cmdname">Nama command / file (opsional)</label>
+          <input type="text" id="cmdname" placeholder="contoh: heal.lua atau /heal">
+        </div>
+
+        <button class="forge" id="genBtn">TEMPA SKRIP</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span id="outFilename">output.lua</span>
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+      <div class="out-body">
+        <div id="outputArea">
+          <div class="placeholder">Belum ada skrip. Isi deskripsi di kiri lalu tekan "Tempa Skrip".</div>
+        </div>
+        <div class="toolbar" id="toolbar" style="display:none;">
+          <button class="tbtn" id="copyBtn">Salin kode</button>
+          <button class="tbtn" id="downloadBtn">Unduh .lua</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="history" id="historyWrap" style="display:none;">
+    <div class="history-title">RIWAYAT SESI INI</div>
+    <div id="historyList"></div>
+  </div>
+
+</div>
+
+<script>
+let history = [];
+
+const genBtn = document.getElementById('genBtn');
+const outputArea = document.getElementById('outputArea');
+const toolbar = document.getElementById('toolbar');
+const outFilename = document.getElementById('outFilename');
+const historyWrap = document.getElementById('historyWrap');
+const historyList = document.getElementById('historyList');
+
+function slugify(s){
+  return (s || 'script')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40) || 'script';
+}
+
+function extractLua(text){
+  const fence = text.match(/```(?:lua)?\s*([\s\S]*?)```/i);
+  if(fence) return fence[1].trim();
+  return text.trim();
+}
+
+async function generateScript(){
+  const desc = document.getElementById('desc').value.trim();
+  const cmdname = document.getElementById('cmdname').value.trim();
+
+  if(!desc){
+    outputArea.innerHTML = '<div class="err">Isi dulu deskripsi skrip yang mau dibuat.</div>';
+    return;
+  }
+
+  genBtn.disabled = true;
+  genBtn.innerHTML = '<span class="spinner"></span>Menempa...';
+  outputArea.innerHTML = '<div class="placeholder">ZEF AI sedang menulis skrip...</div>';
+  toolbar.style.display = 'none';
+
+  const systemPrompt = `Kamu adalah scripter ahli untuk Growtopia Private Server (GTPS) berbasis Lua (server GTPS umum seperti PixelWorlds/ZOPS/GTRI-style).
+Tulis skrip Lua yang bersih, terkomentar dalam Bahasa Indonesia singkat, dan siap ditaruh di folder scripts server.
+Ikuti konvensi umum GTPS Lua server:
+- Gunakan event handler standar bila relevan: onPlayerJoin(player), onPlayerCommand(player, command, args), onPlayerTalk, onPlayerDialogReturn, dsb.
+- Jika butuh cek role admin, cek melalui tabel/role player (mis. player.role atau fungsi IsAdmin(player)) sebelum eksekusi.
+- Jika butuh penyimpanan permanen, gunakan modul sqlite3 dengan query parameterized.
+- Jika butuh menu interaktif, gunakan SendDialog dengan struktur dialog GTPS (label, spacer, button, dsb).
+- Selalu validasi input/argumen sebelum diproses, dan beri pesan balik ke player lewat player:SendChatMessage / OnConsoleMessage.
+- Struktur file rapi: komentar header singkat isi nama command & cara pakai, lalu isi fungsi.
+Output HANYA kode Lua di dalam satu code block, tanpa penjelasan tambahan di luar kode.`;
+
+  const userPrompt = `Buatkan skrip Lua GTPS untuk:
+${desc}
+${cmdname ? `Nama command/file yang diinginkan: ${cmdname}` : ''}`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }]
+      })
+    });
+
+    if(!response.ok){
+      throw new Error("Permintaan ke API gagal (status " + response.status + ")");
+    }
+
+    const data = await response.json();
+    const textBlock = (data.content || []).find(b => b.type === "text");
+    if(!textBlock || !textBlock.text){
+      throw new Error("Tidak ada respons teks dari model.");
+    }
+
+    const code = extractLua(textBlock.text);
+    const filename = slugify(cmdname || desc) + '.lua';
+
+    outFilename.textContent = filename;
+    outputArea.innerHTML = '<pre class="code"></pre>';
+    outputArea.querySelector('.code').textContent = code;
+    toolbar.style.display = 'flex';
+
+    history.unshift({ filename, desc, code });
+    if(history.length > 8) history.pop();
+    renderHistory();
+
+  }catch(err){
+    outputArea.innerHTML = '<div class="err">Gagal generate skrip: ' + (err.message || err) + '</div>';
+  }finally{
+    genBtn.disabled = false;
+    genBtn.textContent = 'TEMPA SKRIP';
+  }
+}
+
+function renderHistory(){
+  if(history.length === 0){ historyWrap.style.display = 'none'; return; }
+  historyWrap.style.display = 'block';
+  historyList.innerHTML = '';
+  history.forEach((h, i) => {
+    const div = document.createElement('div');
+    div.className = 'h-item';
+    div.innerHTML = `<span class="fn">${h.filename}</span><span class="desc">${h.desc}</span>`;
+    div.addEventListener('click', () => {
+      outFilename.textContent = h.filename;
+      outputArea.innerHTML = '<pre class="code"></pre>';
+      outputArea.querySelector('.code').textContent = h.code;
+      toolbar.style.display = 'flex';
+    });
+    historyList.appendChild(div);
+  });
+}
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const codeEl = outputArea.querySelector('.code');
+  if(!codeEl) return;
+  navigator.clipboard.writeText(codeEl.textContent).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const old = btn.textContent;
+    btn.textContent = 'Tersalin!';
+    setTimeout(() => btn.textContent = old, 1400);
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const codeEl = outputArea.querySelector('.code');
+  if(!codeEl) return;
+  const blob = new Blob([codeEl.textContent], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = outFilename.textContent || 'script.lua';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+genBtn.addEventListener('click', generateScript);
+</script>
+</body>
+</html>
